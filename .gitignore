@@ -1,6 +1,7 @@
 .DS_Store
-CRLB_data/**
+CRLB_data
 CRLB_data_fromZero
 grad_surface_plots
 grad_surface_plots_fromZero
 grad_surface_plots_polar
+Papers
