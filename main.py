@@ -6,7 +6,7 @@ setup = data.Setup(lens=40,
                    approaches=['2x2', '2x3', '2x4'],
                    k=0.1,
                    lamda=546,
-                   fromZero=True,
+                   fromZero=False,
                    save=False,
                    filepath=None)
 

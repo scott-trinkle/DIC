@@ -33,8 +33,11 @@ def generate_plots(sigma_g, sigma_t, setup, polar=False,
 
     # saves figure if selected
     if setup.save:
-        plt.savefig(setup.filepath + '{}x_{}.png'.format(
-            setup.lens, 'weak' if setup.weak_grad else 'normal'), dpi=215)
+        plt.savefig(setup.filepath + '{}x_{}grad{}_{}_{}x{}.png'.format(
+            setup.lens, 'weak' if setup.weak_grad else 'normal',
+            '_fromZero' if setup.fromZero and not setup.polar else None,
+            'polar' if setup.polar else 'cart',
+            setup.gamma.shape[0], setup.gamma.shape[0]), dpi=215)
 
     plt.show()  # shows figure regardless of saving
 
