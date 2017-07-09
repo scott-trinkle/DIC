@@ -52,7 +52,7 @@ def generate_plots(sigma_g, sigma_t, expo, polar=False, areaplot=True,
         print('Saving figure...')
         plt.savefig(expo.filepath + '{}x_{}grad{}_{}_{}x{}_{}.png'.format(
             expo.lens, 'weak' if expo.weak_grad else 'normal',
-            '_fromZero' if expo.fromZero and not expo.polar else 'from_0.1',
+            '_fromZero' if (expo.fromZero and not expo.polar) else '_from0.1',
             'polar' if expo.polar else 'cart',
             expo.gamma.shape[0], expo.gamma.shape[0],
             'areaplot' if areaplot else 'rawplot'), dpi=300)
@@ -179,11 +179,12 @@ def make_area_plots(fig, sigma_g, sigma_t, expo):
     fig.legend([Line2D([], [], linestyle='-', color=expo.colors[kk])
                 for kk in range(expo.Na)],
                [approach + ' frames' for approach in expo.approaches],
-               numpoints=1, loc=8, fontsize='large')
+               numpoints=1, loc=(0.45, 0.08), fontsize='large')
 
     plt.tight_layout()  # makes things look nice
 
-    plt.subplots_adjust(top=0.95)  # so subplots don't overlap the main title
+    # so subplots don't overlap the main title
+    plt.subplots_adjust(top=0.95)
 
     return fig
 
