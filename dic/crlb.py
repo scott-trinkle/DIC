@@ -87,7 +87,7 @@ def generate_data(expo=Experiment(), sample_size=100):
 
     # Formats save settings
     if expo.save:
-        print('Saving...')
+        print('Saving CRLB data...')
         np.save(expo.filepath +
                 'sigma_gamma_{}x_{}grad_{}_{}x{}'.format(
                     expo.lens, 'weak' if expo.weak_grad else 'normal',
@@ -99,9 +99,9 @@ def generate_data(expo=Experiment(), sample_size=100):
                     expo.lens, 'weak' if expo.weak_grad else 'normal',
                     'fromZero' if expo.fromZero else None,
                     sample_size, sample_size), sigma_g)
-    print('Done!')
+    print('Calculating CRLBs: Done!')
 
-    return sigma_g, sigma_t, expo
+    return np.sqrt(sigma_g), np.sqrt(sigma_t), expo
 
 
 def derive_CRLBs(I_ent, lamda, bias, d, Ic):
