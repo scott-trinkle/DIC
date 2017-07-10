@@ -30,7 +30,7 @@ class Experiment(object):
 
     def __init__(self, lens=40, weak_grad=False,
                  approaches=['2x2', '2x3', '2x4'],
-                 k=0.1, fromZero=True, save=False, filepath=None):
+                 k=0.5, fromZero=True, save=False, filepath=None):
         self.lens = lens
         self.weak_grad = weak_grad
         self.approaches = approaches
@@ -69,6 +69,7 @@ class Experiment(object):
     def derive_CRLBs(self, equalize_dose=True, approach='2x2'):
 
         lamda = 546  # nm
+
         if not self.weak_grad:  # a normal specimen
             bias_j = 0.15 * lamda
         else:  # a weak gradient specimen
