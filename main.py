@@ -17,7 +17,8 @@ expo = Experiment(lens=100,
 sigma_g, sigma_t, expo = generate_data(expo, sample_size=100)
 generate_plots(sigma_g, sigma_t, expo,
                polar=True,
-               areaplot=True)
+               areaplot=True,
+               show=True)
 
 # for lens in [40, 100]:
 #     for weak_grad in [True, False]:
