@@ -43,7 +43,7 @@ def generate_data(expo=Experiment(), sample_size=100):
 
             # Calls derive_CRLBs function
             sigma_g_func, sigma_t_func = expo.derive_CRLBs(
-                equalize_dose, approach)
+                equalize_dose=equalize_dose, approach=approach)
 
             # stores data for 4x4 plots. Prevents divide by zero warning.
             with np.errstate(divide='ignore', invalid='ignore'):

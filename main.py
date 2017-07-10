@@ -4,11 +4,10 @@ from dic.plots import generate_plots, make_cartesian_plots, make_polar_plots
 import numpy as np
 import matplotlib.pyplot as plt
 
-expo = Experiment(lens=100,
+expo = Experiment(lens=40,
                   weak_grad=True,
                   approaches=['2x2', '2x3', '2x4'],
                   k=0.1,
-                  lamda=546,
                   fromZero=True,
                   save=False,
                   filepath=None)

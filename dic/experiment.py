@@ -30,13 +30,11 @@ class Experiment(object):
 
     def __init__(self, lens=40, weak_grad=False,
                  approaches=['2x2', '2x3', '2x4'],
-                 k=0.1, lamda=546, fromZero=True,
-                 save=False, filepath=None):
+                 k=0.1, fromZero=True, save=False, filepath=None):
         self.lens = lens
         self.weak_grad = weak_grad
         self.approaches = approaches
         self.k = k
-        self.lamda = lamda
         self.fromZero = fromZero
         self.save = save
         self.filepath = filepath
@@ -143,8 +141,8 @@ class Experiment(object):
         sigma_g = F22 / det  # equivalent to [F^-1]_11
         sigma_t = F11 / det  # equivalent to [F^-1]_22
 
-        # Sympy function that converts a sympy expression into a numpy-based python
-        # function
+        # Sympy function that converts a sympy expression into a numpy-based
+        # python function
         sigma_g_func = sym.lambdify((gamma, theta), sigma_g, 'numpy')
         sigma_t_func = sym.lambdify((gamma, theta), sigma_t, 'numpy')
 
