@@ -6,7 +6,7 @@ import matplotlib.ticker as tck
 from dic.experiment import Experiment
 
 
-def generate_plots(sigma_g, sigma_t, expo, polar=False, areaplot=True,
+def generate_plots(sigma_g, sigma_t, experiment, polar=False, areaplot=True,
                    show=True, fignum=1, size=(14, 7.8)):
     ''' Generates and plots a single figure to visualize CRLB data
 
@@ -16,8 +16,8 @@ def generate_plots(sigma_g, sigma_t, expo, polar=False, areaplot=True,
         sigma_g data
     sigma_t : ndarray
         sigma_t data
-    expo : Experiment instance
-        Contains all experiment parameters
+    experiment : Experiment instance
+        Contains all experiment parameters and methods
     polar : bool
         If True, plots in polar coordinates. Default is False.
     fignum : int
@@ -26,14 +26,14 @@ def generate_plots(sigma_g, sigma_t, expo, polar=False, areaplot=True,
         Figure size
     '''
 
-    expo.polar = polar
+    experiment.polar = polar
 
-    if expo.polar and not expo.fromZero:
+    if experiment.polar and not experiment.fromZero:
         raise ValueError('Gamma range must be set to zero for polar plotting')
 
     # colors for different aquisition approaches within a single plot.
     # Will need to extend if we ever look at more than 3 approaches.
-    expo.colors = ['maroon', 'seagreen', 'royalblue']
+    experiment.colors = ['maroon', 'seagreen', 'royalblue', 'gold']
 
     plt.close()  # clear any existing plots in the python interpreter
 
@@ -41,20 +41,21 @@ def generate_plots(sigma_g, sigma_t, expo, polar=False, areaplot=True,
 
     # Title for entire figure
     fig.suptitle('{}x Objective, {} gradient'.format(
-        expo.lens, 'Weak' if expo.weak_grad else 'Normal'), weight='bold')
+        experiment.lens, 'Weak' if experiment.weak_grad else 'Normal'), weight='bold')
 
     print('Starting figure...')
-    fig = make_area_plots(fig, sigma_g, sigma_t, expo) if areaplot else make_raw_plots(
-        fig, sigma_g, sigma_t, expo)
+    fig = make_area_plots(fig, sigma_g, sigma_t, experiment) if areaplot else make_raw_plots(
+        fig, sigma_g, sigma_t, experiment)
 
     # saves figure if selected
-    if expo.save:
+    if experiment.save:
         print('Saving figure...')
-        plt.savefig(expo.filepath + '{}x_{}grad{}_{}_{}x{}_{}.png'.format(
-            expo.lens, 'weak' if expo.weak_grad else 'normal',
-            '_fromZero' if (expo.fromZero and not expo.polar) else '_from0.1',
-            'polar' if expo.polar else 'cart',
-            expo.gamma.shape[0], expo.gamma.shape[0],
+        plt.savefig(experiment.filepath + '{}x_{}grad{}_{}_{}x{}_{}.png'.format(
+            experiment.lens, 'weak' if experiment.weak_grad else 'normal',
+            '_fromZero' if (
+                experiment.fromZero and not experiment.polar) else '_from0.1',
+            'polar' if experiment.polar else 'cart',
+            experiment.gamma.shape[0], experiment.gamma.shape[0],
             'areaplot' if areaplot else 'rawplot'), dpi=300)
     if show:
         print('Displaying figure...')
@@ -63,7 +64,7 @@ def generate_plots(sigma_g, sigma_t, expo, polar=False, areaplot=True,
     return
 
 
-def make_raw_plots(fig, sigma_g, sigma_t, expo):
+def make_raw_plots(fig, sigma_g, sigma_t, experiment):
     ''' Makes a 2x2 figure that plots 3D CRLBS for gamma and theta under both
     equal and non-equal dose conditions.
 
@@ -75,7 +76,7 @@ def make_raw_plots(fig, sigma_g, sigma_t, expo):
         CRLB data for gamma
     sigma_t : ndarray
         CRLB data for theta
-    expo : Experiment instance
+    experiment : Experiment instance
         Experiment parameters
 
     Returns
@@ -98,16 +99,16 @@ def make_raw_plots(fig, sigma_g, sigma_t, expo):
             # adds to 2x2 grid of 3D subplots
             ax.append(fig.add_subplot(2, 2, ind + 1, projection='3d'))
 
-            if expo.polar:
+            if experiment.polar:
                 ax[ind] = make_polar_plots(
                     ax[ind],
                     sigma_g[dose_num] if var == 'gamma' else sigma_t[dose_num],
-                    expo)
+                    experiment)
             else:
                 ax[ind] = make_cartesian_plots(
                     ax[ind],
                     sigma_g[dose_num] if var == 'gamma' else sigma_t[dose_num],
-                    expo)
+                    experiment)
 
             # sets title of subplot
             title = '{} dose CRLB for '.format(
@@ -117,9 +118,9 @@ def make_raw_plots(fig, sigma_g, sigma_t, expo):
 
     # Adds single legend
     print('Adding legend...')
-    fig.legend([Line2D([], [], linestyle='-', color=expo.colors[kk])
-                for kk in range(expo.Na)],
-               [approach + ' frames' for approach in expo.approaches],
+    fig.legend([Line2D([], [], linestyle='-', color=experiment.colors[kk])
+                for kk in range(experiment.Na)],
+               [approach + ' frames' for approach in experiment.approaches],
                numpoints=1, loc=10, fontsize='large')
 
     plt.tight_layout()  # makes things look nice
@@ -129,7 +130,7 @@ def make_raw_plots(fig, sigma_g, sigma_t, expo):
     return fig
 
 
-def make_area_plots(fig, sigma_g, sigma_t, expo):
+def make_area_plots(fig, sigma_g, sigma_t, experiment):
     ''' Makes a 2x2 figure that plots the area product gamma*sigma_g*sigma_t 
     under both equal and non-equal dose conditions.
 
@@ -141,7 +142,7 @@ def make_area_plots(fig, sigma_g, sigma_t, expo):
         CRLB data for gamma
     sigma_t : ndarray
         CRLB data for theta
-    expo : Experiment instance
+    experiment : Experiment instance
         Experiment parameters
 
     Returns
@@ -151,7 +152,7 @@ def make_area_plots(fig, sigma_g, sigma_t, expo):
     '''
     ax = []
 
-    err_area = expo.gamma * sigma_g * sigma_t
+    err_area = experiment.gamma * sigma_g * sigma_t
 
     # iterates through equalize_dose=True and False as well as
     # variables (gamma and theta) to add Axes instances to fig
@@ -162,12 +163,12 @@ def make_area_plots(fig, sigma_g, sigma_t, expo):
         # adds to 2x2 grid of 3D subplots
         ax.append(fig.add_subplot(1, 2, dose_num + 1, projection='3d'))
 
-        if expo.polar:
+        if experiment.polar:
             ax[dose_num] = make_polar_plots(
-                ax[dose_num], err_area[dose_num], expo)
+                ax[dose_num], err_area[dose_num], experiment)
         else:
             ax[dose_num] = make_cartesian_plots(
-                ax[dose_num], err_area[dose_num], expo)
+                ax[dose_num], err_area[dose_num], experiment)
 
         # sets title of subplot
         title = '{} dose CRLB for '.format(
@@ -176,9 +177,9 @@ def make_area_plots(fig, sigma_g, sigma_t, expo):
 
     # Adds single legend
     print('Adding legend...')
-    fig.legend([Line2D([], [], linestyle='-', color=expo.colors[kk])
-                for kk in range(expo.Na)],
-               [approach + ' frames' for approach in expo.approaches],
+    fig.legend([Line2D([], [], linestyle='-', color=experiment.colors[kk])
+                for kk in range(experiment.Na)],
+               [approach + ' frames' for approach in experiment.approaches],
                numpoints=1, loc=(0.45, 0.08), fontsize='large')
 
     plt.tight_layout()  # makes things look nice
@@ -222,7 +223,7 @@ def setup_ax(ax, elev, azim):
     return ax
 
 
-def make_cartesian_plots(ax, sigma, expo):
+def make_cartesian_plots(ax, sigma, experiment):
     ''' Plots CRLB on 3D cartesian grid
 
     Parameters
@@ -235,7 +236,7 @@ def make_cartesian_plots(ax, sigma, expo):
         and theta.
     var : str
         Either 'gamma' or 'theta'
-    expo : Experiment instance
+    experiment : Experiment instance
         Experiment parameters
 
     Returns
@@ -247,7 +248,7 @@ def make_cartesian_plots(ax, sigma, expo):
     setup_ax(ax, elev=15, azim=-70)
 
     # Fixes dividing by zero errors. Sets 'inf' to the highest non-inf value
-    if expo.fromZero and sigma.max() == np.inf:
+    if experiment.fromZero and sigma.max() == np.inf:
         sigma[np.where(sigma == np.inf)] = sorted(set(sigma.flatten()))[-2]
         sigma = np.log10(sigma)
 
@@ -259,15 +260,15 @@ def make_cartesian_plots(ax, sigma, expo):
                               r'}') for tick in zticks])
 
     # iterates through approaches to plot Na surfaces on each Axes object
-    for app_num in range(expo.Na):
+    for app_num in range(experiment.Na):
         ax.plot_surface(
-            expo.gamma, expo.theta, sigma[app_num],
-            color=expo.colors[app_num], antialiased=True, alpha=0.7)
+            experiment.gamma, experiment.theta, sigma[app_num],
+            color=experiment.colors[app_num], antialiased=True, alpha=0.7)
 
     return ax
 
 
-def make_polar_plots(ax, sigma, expo):
+def make_polar_plots(ax, sigma, experiment):
     ''' Plots CRLB on 3D polar grid
 
     Parameters
@@ -280,7 +281,7 @@ def make_polar_plots(ax, sigma, expo):
         and theta.
     var : str
         Either 'gamma' or 'theta'
-    expo : Experiment instance
+    experiment : Experiment instance
         Experiment parameters
 
     Returns
@@ -304,13 +305,13 @@ def make_polar_plots(ax, sigma, expo):
                               r'}') for tick in zticks])
 
     # Puts x and y in polar coordinates
-    x, y = (expo.gamma * np.cos(expo.theta), expo.gamma *
-            np.sin(expo.theta))
+    x, y = (experiment.gamma * np.cos(experiment.theta), experiment.gamma *
+            np.sin(experiment.theta))
 
     # iterates through approaches to plot Na surfaces on each Axes object
-    for app_num in range(expo.Na):
+    for app_num in range(experiment.Na):
         ax.plot_surface(
-            x, y, sigma[app_num], color=expo.colors[app_num],
+            x, y, sigma[app_num], color=experiment.colors[app_num],
             antialiased=True, alpha=0.7)
 
     # Adjusts ticks and labels
