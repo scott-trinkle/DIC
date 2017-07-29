@@ -3,8 +3,8 @@ import sympy as sym
 
 
 class Experiment(object):
-    '''Class which stores all of the experiment parameters and methods for 
-    deriving and calculating CRLB data. 
+    '''Class which stores all of the experiment parameters and methods for
+    deriving and calculating CRLB data.
 
 
     Attributes
@@ -15,7 +15,7 @@ class Experiment(object):
         If True, calculate CRLBs for weak gradient specimens. Default is False.
     lamda : int
         Wavelength of light used for the experiment (in nm). Note: 'lambda' is
-        an existing Python function. Hence the misspelling. 
+        an existing Python function. Hence the misspelling.
     approaches : list of strings
         List of the acquisition approaches. Default is ['2x2', '2x3', '2x4']
     k : float
@@ -32,7 +32,7 @@ class Experiment(object):
 
     def __init__(self, lens=40, weak_grad=False, lamda=546,
                  approaches=['A: 2x2', 'A: 2x3', 'B: 2x3', 'B: 2x4'],
-                 k=0.005, fromZero=True, save=False, filepath=None):
+                 k=1e3, fromZero=True, save=False, filepath=None):
         self.lens = lens
         self.weak_grad = weak_grad
         self.lamda = lamda
@@ -70,6 +70,24 @@ class Experiment(object):
         return self.gamma, self.theta
 
     def derive_CRLBs(self, equalize_dose=True, approach='A: 2x2'):
+        '''This function uses the SymPy symbolic math package to derive the
+        expression for the CRLB for both gamma and theta for a given
+        experimental condition.
+
+        Attributes:
+        ___________
+        equalize_dose : bool
+            If true, equalizes total dose across all acquisition frames. Default
+            is true.
+        approach : str
+            Acquisition approach label.
+
+        Returns:
+        ________
+        sigma_g_func : NumPy function
+            NumPy function that generates numerical CRLB values for gamma
+        sigma_t_func : NumPy function
+            NumPy function that generates numerical CRLB values for theta'''
 
         if not self.weak_grad:  # a normal specimen
             bias_j = 0.15 * self.lamda
@@ -78,10 +96,10 @@ class Experiment(object):
 
         if self.lens == 40:
             d = 255  # shear distance in nm
-            I_ent = 50 * self.k  # exp time in us (future: entrance intensity)
+            I_ent = self.k  # entrance intensity (40x get 50 us exposure)
         elif self.lens == 100:
             d = 100
-            I_ent = 200 * self.k
+            I_ent = self.k  # 100x gets 200 us exposure
         else:
             raise ValueError('Please enter expo.lens = 40 or expo.lens = 100')
 
@@ -155,19 +173,19 @@ class Experiment(object):
     def generate_data(self, sample_size=100):
         '''
         Returns two numpy arrays containing data for the Cramer Rao Lower Bounds
-        for the standard deviations of gamma and theta for OI-DIC.
+        for the standard deviations of gamma and theta for OI - DIC.
 
         Parameters
         __________
-        sample_size : int
+        sample_size: int
             Sample size for gamma and theta
 
         Returns
         _______
-        sigma_g : ndarray
+        sigma_g: ndarray
             CRLB data for gamma for the specified physical parameters.
             Shape is (2, len(approaches), sample_size, sample_size).
-        sigma_t : ndarray
+        sigma_t: ndarray
             CRLB data for theta for the specified physical parameters.
             Shape is (2, len(approaches), sample_size, sample_size).
         '''

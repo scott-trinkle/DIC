@@ -32,8 +32,7 @@ def generate_plots(sigma_g, sigma_t, experiment, polar=False, areaplot=True,
         raise ValueError('Gamma range must be set to zero for polar plotting')
 
     # colors for different aquisition approaches within a single plot.
-    # Will need to extend if we ever look at more than 3 approaches.
-    experiment.colors = ['maroon', 'seagreen', 'royalblue', 'gold']
+    experiment.colors = ['maroon', 'seagreen', 'gold', 'royalblue']
 
     plt.close()  # clear any existing plots in the python interpreter
 
