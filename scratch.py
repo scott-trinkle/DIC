@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from dic.experiment import Experiment
 
+# Initial work in propagating variance to OPL
+
 a, b = 0.1, 0.3
 size = (100, 100)
 

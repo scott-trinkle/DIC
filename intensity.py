@@ -2,6 +2,8 @@ from dic.experiment import Experiment
 import numpy as np
 import matplotlib.pyplot as plt
 
+'''This script generates plots of median CRLB error area as a function of
+entrance intensity'''
 
 experiment = Experiment(lens=40,
                         weak_grad=False)

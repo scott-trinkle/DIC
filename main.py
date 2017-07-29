@@ -1,6 +1,14 @@
 from dic.experiment import Experiment
 from dic.plots import generate_plots
 
+'''This script generates data for a given experiment condition and plots it in
+a single figure. Plotting options are:
+
+polar: Plots in polar coordinates if true, otherwise Cartesian. 
+areaplot: Plots the "error area" (\gamma*\sigma_gamma*\sigma_theta) if true,
+          otherwise, creates 4x4 variable-specific plots
+show: Displays the figure if true, otherwise does not. Used when saving.'''
+
 experiment = Experiment(lens=40,
                         weak_grad=False,
                         lamda=546,

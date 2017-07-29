@@ -2,6 +2,8 @@ from dic.experiment import Experiment
 from dic.crlb import generate_data
 from dic.plots import generate_plots
 
+# Saves plots for all relevant experiment conditions.
+
 count = 1
 
 for lens in [40, 100]:
