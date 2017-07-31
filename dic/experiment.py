@@ -160,8 +160,8 @@ class Experiment(object):
 
         # Note: sympy has a matrix inverse function, but it is
         # very slow for these huge expressions.
-        sigma_g = F22 / det  # equivalent to [F^-1]_11
-        sigma_t = F11 / det  # equivalent to [F^-1]_22
+        sigma_g = sym.sqrt(F22 / det)  # equivalent to [F^-1]_11
+        sigma_t = sym.sqrt(F11 / det)  # equivalent to [F^-1]_22
 
         # Sympy function that converts a sympy expression into a numpy-based
         # python function
@@ -216,19 +216,19 @@ class Experiment(object):
                             :] = sigma_t_func(gamma, theta)
 
         # Formats save settings
-        if self.save:
-            print('Saving CRLB data...')
-            np.save(self.filepath +
-                    'sigma_gamma_{}x_{}grad_{}_{}x{}'.format(
-                        self.lens, 'weak' if self.weak_grad else 'normal',
-                        'fromZero' if self.fromZero else None,
-                        sample_size, sample_size), sigma_g)
+        # if self.save:
+        #     print('Saving CRLB data...')
+        #     np.save(self.filepath +
+        #             'sigma_gamma_{}x_{}grad_{}_{}x{}'.format(
+        #                 self.lens, 'weak' if self.weak_grad else 'normal',
+        #                 'fromZero' if self.fromZero else None,
+        #                 sample_size, sample_size), sigma_g)
 
-            np.save(self.filepath +
-                    'sigma_theta_{}x_{}grad_{}_{}x{}'.format(
-                        self.lens, 'weak' if self.weak_grad else 'normal',
-                        'fromZero' if self.fromZero else None,
-                        sample_size, sample_size), sigma_g)
+        #     np.save(self.filepath +
+        #             'sigma_theta_{}x_{}grad_{}_{}x{}'.format(
+        #                 self.lens, 'weak' if self.weak_grad else 'normal',
+        #                 'fromZero' if self.fromZero else None,
+        #                 sample_size, sample_size), sigma_g)
         print('Calculating CRLBs: Done!')
 
-        return np.sqrt(sigma_g), np.sqrt(sigma_t)
+        return sigma_g, sigma_t

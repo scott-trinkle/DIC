@@ -7,7 +7,7 @@ from dic.experiment import Experiment
 
 
 def generate_plots(sigma_g, sigma_t, experiment, polar=False, areaplot=True,
-                   show=True, fignum=1, size=(14, 7.8)):
+                   SNR=False, show=True, fignum=1, size=(14, 7.8)):
     ''' Generates and plots a single figure to visualize CRLB data
 
     Parameters
@@ -27,10 +27,7 @@ def generate_plots(sigma_g, sigma_t, experiment, polar=False, areaplot=True,
     '''
 
     experiment.polar = polar
-
-    if experiment.polar and not experiment.fromZero:
-        raise ValueError('Gamma range must be set to zero for polar plotting')
-
+    experiment.SNR = SNR
     # colors for different aquisition approaches within a single plot.
     experiment.colors = ['maroon', 'seagreen', 'gold', 'royalblue']
 
@@ -41,6 +38,11 @@ def generate_plots(sigma_g, sigma_t, experiment, polar=False, areaplot=True,
     # Title for entire figure
     fig.suptitle('{}x Objective, {} gradient'.format(
         experiment.lens, 'Weak' if experiment.weak_grad else 'Normal'), weight='bold')
+
+    # Reformulates as a sort of "SNR" plot
+    if experiment.SNR:
+        sigma_g = experiment.gamma / sigma_g
+        sigma_t = experiment.theta / sigma_t
 
     print('Starting figure...')
     fig = make_area_plots(fig, sigma_g, sigma_t, experiment) if areaplot else make_raw_plots(
@@ -110,9 +112,15 @@ def make_raw_plots(fig, sigma_g, sigma_t, experiment):
                     experiment)
 
             # sets title of subplot
-            title = '{} dose CRLB for '.format(
-                'Equal' if equalize_dose else 'Non-equal') + r'$\sigma_{}$'.format(
-                r'{\gamma}' if var == 'gamma' else r'{\theta}')
+            if experiment.SNR:
+                title = '{} dose "SNR" - '.format(
+                    'Equal' if equalize_dose else 'Non-equal') + r'${} / \sigma_{}$'.format(
+                        r'{\gamma}' if var == 'gamma' else r'{\theta}',
+                        r'{\gamma}' if var == 'gamma' else r'{\theta}')
+            else:
+                title = '{} dose CRLB for '.format(
+                    'Equal' if equalize_dose else 'Non-equal') + r'$\sigma_{}$'.format(
+                        r'{\gamma}' if var == 'gamma' else r'{\theta}')
             ax[ind].set_title(title)
 
     # Adds single legend
@@ -170,8 +178,13 @@ def make_area_plots(fig, sigma_g, sigma_t, experiment):
                 ax[dose_num], err_area[dose_num], experiment)
 
         # sets title of subplot
-        title = '{} dose CRLB for '.format(
-            'Equal' if equalize_dose else 'Non-equal') + r'$\gamma\sigma_{\gamma}\sigma_{\theta}$'
+        if experiment.SNR:
+            title = '{} dose "SNR" - '.format(
+                'Equal' if equalize_dose else 'Non-equal') + r'$\gamma\theta / \gamma\sigma_{\gamma}\sigma_{\theta}$'
+        else:
+            title = '{} dose CRLB for - '.format(
+                'Equal' if equalize_dose else 'Non-equal') + r'$\gamma\sigma_{\gamma}\sigma_{\theta}$'
+
         ax[dose_num].set_title(title)
 
     # Adds single legend
