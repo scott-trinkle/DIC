@@ -208,7 +208,7 @@ class Experiment(object):
                 sigma_g_func, sigma_t_func = self.derive_CRLBs(
                     equalize_dose=equalize_dose, approach=approach)
 
-                # stores data for 4x4 plots. Prevents divide by zero warning.
+                # stores data for plots. Prevents divide by zero warning.
                 with np.errstate(divide='ignore', invalid='ignore'):
                     sigma_g[dose_num, app_num, :,
                             :] = sigma_g_func(gamma, theta)

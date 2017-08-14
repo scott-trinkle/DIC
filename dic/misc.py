@@ -29,28 +29,28 @@ def make_phantom(rows, cols):
     x1 = cols * 0.25
     y0 = rows * 0.08
     y1 = rows * 0.45
-    draw.rectangle([x0, y0, x1, y1], fill=50.1)
+    draw.rectangle([x0, y0, x1, y1], fill=50.3)
 
     # Rectangle 2
     x0 = cols * 0.10
     x1 = cols * 0.2
     y0 = rows * 0.15
     y1 = rows * 0.40
-    draw.rectangle([x0, y0, x1, y1], fill=49.8)
+    draw.rectangle([x0, y0, x1, y1], fill=49.9)
 
     # Rectangle 3
     x0 = cols * 0.15
     x1 = cols * 0.45
     y0 = rows * 0.6
     y1 = rows * 0.9
-    draw.rectangle([x0, y0, x1, y1], fill=50.1)
+    draw.rectangle([x0, y0, x1, y1], fill=50.3)
 
     # Circle 1
     x0 = cols * 0.70
     x1 = cols * 0.75
     y0 = rows * 0.60
     y1 = rows * 0.65
-    draw.ellipse([x0, y0, x1, y1], fill=50.2)
+    draw.ellipse([x0, y0, x1, y1], fill=49.8)
 
     # Circle 2
     x0 = cols * 0.80

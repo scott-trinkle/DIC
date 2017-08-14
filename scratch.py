@@ -1,36 +1,31 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from dic.misc import make_phantom
 from dic.experiment import Experiment
 
-# Initial work in propagating variance to OPL
+'''Using this script to experiment with propagating variance to OPL'''
 
-a, b = 0.1, 0.3
-size = (100, 100)
+OPL = make_phantom(512, 512)
 
-np.random.seed(19680801)
+dy, dx = np.gradient(OPL)  # generates cartesian gradient images
 
-gamma = (b - a) * np.random.random(size) + a
-theta = 2 * np.pi * np.random.random(size)
+gamma = np.sqrt(dy**2 + dx**2)  # gradient magnitude
+theta = np.arctan2(dy, dx)  # gradient azimuth on [-pi/2, pi/2]...
+theta[theta < 0.0] += 2 * np.pi  # ...shifting to [0, 2pi]
 
-G = gamma * np.exp(1j * theta)
+experiment = Experiment(lens=40, weak_grad=True)
+g_func, t_func = experiment.derive_CRLBs()
 
-expo = Experiment(lens=40,
-                  weak_grad=False,
-                  approaches=['2x2', '2x3', '2x4'],
-                  k=0.5,
-                  fromZero=True)
+sigma_g = g_func(gamma, theta)
+sigma_t = t_func(gamma, theta)
 
-u2_gamma, u2_theta = expo.derive_CRLBs(equalize_dose=True, approach='2x2')
+sigma_g[gamma == 0] = 0
+sigma_t[gamma == 0] = 0
 
-u2_G = np.exp(2j * theta) * (u2_gamma(gamma, theta) -
-                             gamma**2 * u2_theta(gamma, theta))
+var_grad = np.exp(2 * 1j * theta) * (sigma_g**2 - gamma**2 * sigma_t**2)
 
+Us = np.fft.fft2(var_grad)
 
-# wx = np.zeros(size)
-# wx[:, :] = np.arange(size[0]) + 1
-# wy = wx.T
-
-
-# FG = np.fft.fft2(G)
-# OPL1 = np.fft.ifft2(G / (1j * (wx + 1j * wy)))
-# OPL2 = np.fft.ifft2(np.fft.fft2(G) / (1j * (wx + 1j * wy)))
+plt.imshow(abs(Us))
+plt.colorbar()
+plt.show()

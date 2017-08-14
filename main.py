@@ -22,7 +22,7 @@ experiment = Experiment(lens=40,
 sigma_g, sigma_t = experiment.generate_data(sample_size=100)
 
 generate_plots(sigma_g, sigma_t, experiment,
-               polar=False,
-               areaplot=False,
-               SNR=True,
+               polar=True,
+               areaplot=True,
+               SNR=False,
                show=True)
