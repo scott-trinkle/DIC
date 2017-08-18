@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw
 
 
 def make_phantom(rows, cols):
-    '''This function generates a phantom for use in testing the propagation 
+    '''This function generates a phantom for use in testing the propagation
     of variance in gamma and theta into the OPL
 
     Parameters
@@ -75,3 +75,47 @@ def make_phantom(rows, cols):
 
     OPL = np.array(OPL)
     return OPL
+
+
+def calculate_OPL_var(OPL, experiment):
+    '''Takes a phantom (OPL) and experiment conditions and calculates the 
+    variance of the OPL image for equal and non-equal dose conditions for 
+    all acquisition approaches. 
+
+    Returns n x m "varOPL" array, where n is [True, False] dose conditions, 
+    and m is experiment.approaches'''
+
+    N, M = OPL.shape
+
+    dy, dx = np.gradient(OPL)  # cartesian gradients
+    gamma = np.sqrt(dy**2 + dx**2)  # gradient magnitude
+    theta = np.arctan2(dy, dx)  # gradient azimuth on [-pi/2, pi/2]
+    theta[theta < 0.0] += 2 * np.pi  # shifting to [0, 2pi]
+    G = gamma * np.exp(1j * theta)
+
+    varOPL = np.zeros((2, len(experiment.approaches)))
+
+    # iterating over equal/nonequal dose and all approaches
+    for dose_num, equalize_dose in enumerate([True, False]):
+        for app_num, approach in enumerate(experiment.approaches):
+
+            # NumPy generator functions for CRLB of sigma_gamma and sigma_theta
+            gamma_func, theta_func = experiment.derive_CRLBs(equalize_dose=equalize_dose,
+                                                             approach=approach)
+            # Ignores divide by 0 errors
+            with np.errstate(divide='ignore', invalid='ignore'):
+                sigma_gamma = gamma_func(gamma, theta)
+                sigma_theta = theta_func(gamma, theta)
+
+            # Most of the image has gamma = 0, sigma_gamma = inf
+            sigma_gamma[gamma == 0] = 0
+            sigma_theta[gamma == 0] = 0
+
+            # law of propagation of variance
+            varG = sigma_gamma ** 2 + gamma ** 2 * sigma_theta ** 2
+            K, L = np.meshgrid(np.arange(1, N + 1), np.arange(1, M + 1))
+            s = (1 / (K**2 + L**2)).sum()
+
+            varOPL[dose_num, app_num] = (N * M)**-2 * s * varG.sum()
+
+    return varOPL

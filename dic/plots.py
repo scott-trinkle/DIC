@@ -131,7 +131,7 @@ def make_raw_plots(fig, sigma_g, sigma_t, experiment):
 
 
 def make_area_plots(fig, sigma_g, sigma_t, experiment):
-    ''' Makes a 2x2 figure that plots the area product gamma*sigma_g*sigma_t 
+    ''' Makes a 2x2 figure that plots the area product gamma*sigma_g*sigma_t
     under both equal and non-equal dose conditions.
 
     Parameters
@@ -427,3 +427,29 @@ def plot_gradients(im):
     ax4.set_title('Gradient Azimuth')
     fig.tight_layout()
     plt.show()
+
+
+def plot_OPL_var(varOPL, experiment, show=True):
+    width = 0.30
+    n = len(experiment.approaches)
+
+    plt.close()
+    plt.bar(np.arange(n), np.sqrt(varOPL[0, :]), width, label='Equal Dose')
+    plt.bar(np.arange(n) + width,
+            np.sqrt(varOPL[1, :]), width, label='Non-equal Dose')
+    plt.legend()
+    plt.title('{}x Objective, {} gradient'.format(
+        experiment.lens, 'Weak' if experiment.weak_grad else 'Normal'))
+    plt.xlabel('Acquisition Approach')
+    plt.ylabel(r'$\sigma_{OPL}$')
+    plt.gca().ticklabel_format(axis='y', style='sci', scilimits=(-2, 2))
+    plt.xticks(np.arange(n) + width / 2, experiment.approaches)
+    plt.tight_layout()
+
+    if show:
+        plt.show()
+
+    if experiment.save:
+        plt.savefig(experiment.filepath + 'var_OPL_{}x_{}_gradient'.format(
+            experiment.lens, 'Weak' if experiment.weak_grad else 'Normal'),
+            dpi=400)
