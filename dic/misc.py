@@ -78,7 +78,7 @@ def make_phantom(rows, cols):
 
 
 def calculate_OPL_var(OPL, experiment):
-    '''Takes a phantom (OPL) and experiment conditions and calculates the 
+    '''Takes a phantom (OPL) and an Experiment instance and calculates the 
     variance of the OPL image for equal and non-equal dose conditions for 
     all acquisition approaches. 
 
@@ -115,7 +115,6 @@ def calculate_OPL_var(OPL, experiment):
             varG = sigma_gamma ** 2 + gamma ** 2 * sigma_theta ** 2
             K, L = np.meshgrid(np.arange(1, N + 1), np.arange(1, M + 1))
             s = (1 / (K**2 + L**2)).sum()
-
             varOPL[dose_num, app_num] = (N * M)**-2 * s * varG.sum()
 
     return varOPL

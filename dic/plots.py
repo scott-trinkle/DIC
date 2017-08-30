@@ -430,6 +430,10 @@ def plot_gradients(im):
 
 
 def plot_OPL_var(varOPL, experiment, show=True):
+    '''For a given varOPL array and Experiment instance, plots
+    the equal and non-equal dose image variances for each 
+    acquisition approach'''
+
     width = 0.30
     n = len(experiment.approaches)
 
