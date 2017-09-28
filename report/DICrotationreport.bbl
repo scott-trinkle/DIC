@@ -1,0 +1,27 @@
+\begin{thebibliography}{1}
+
+\bibitem{physicstoday}
+G.~Popescu, ``The power of imaging with phase, not power,'' {\em Physics
+  Today}, vol.~70, pp.~34--40, 5 2017.
+
+\bibitem{shribakbook}
+M.~Shribak, ``Differential interference microscopy,'' in {\em Biomedical
+  Optical Phase Microscopy and Nanoscopy} (N.~T. Shaked, Z.~Zalevsky, and L.~L.
+  Satterwhite, eds.), ch.~2, pp.~19--42, Elsevier, 2012.
+
+\bibitem{shribak}
+M.~Shribak, K.~G. Larkin, and D.~Biggs, ``Mapping optical path length and image
+  enhancement using quantitative orientation-independent differential
+  interference contrast microscopy,'' {\em Journal of Biomedical Optics},
+  vol.~22, pp.~016006--1 -- 016006--12, 1 2017.
+
+\bibitem{microbook}
+J.~Mertz, {\em Introduction to Optical Microscopy}, ch.~10, pp.~199--206.
+\newblock Greenwood Village, CO: Roberts and Company Publishers, 2010.
+
+\bibitem{fisher}
+J.~Chao, E.~S. Ward, and R.~J. Ober, ``Fisher information theory for parameter
+  estimation in single molecule microscopy: tutorial,'' {\em Journal of the
+  Optical Society of America A}, vol.~33, pp.~B36--B57, 7 2016.
+
+\end{thebibliography}

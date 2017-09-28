@@ -1,0 +1,204 @@
+\documentclass[aps, secnumarabic, amssymb, notitlepage]{article}
+\usepackage[letterpaper, margin=1.0in]{geometry} % can add margin=x
+\usepackage[font=small]{caption}
+\usepackage[capbesideposition={center, outside}, capbesidewidth=5cm]{floatrow}
+\floatsetup[table]{capposition=top}
+\usepackage{authblk}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{gensymb}
+\usepackage{outlines}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{float}
+
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+\setlength\parindent{1cm}
+
+% \renewcommand{\baselinestretch}{2.0}
+\begin{document}
+%\renewcommand{\baselinestretch}{1.0}
+\title{Acquisition approach optimization in orientation-independent differential interference contrast microscopy}
+\author{Scott Trinkle and Patrick La Rivi\`ere}
+\renewcommand\Affilfont{\fontsize{10}{10.8}\itshape}
+\affil{Graduate Program in Medical Physics, The University of Chicago}
+\date{}
+
+\maketitle
+
+\begin{abstract}
+  Differential interference contrast (DIC) microscopy produces an image through the interference of a reference beam and a sheared copy of itself. The measured intensity can be related to the gradient of the optical path length (OPL) through the specimen. Shribak \cite{shribak} has developed an orientation-independent DIC technique that estimates the magnitude and azimuth of the OPL gradient through one of four different acquisition approaches that differ in the sampling of biases between the two interfering beams. The ``A'' algorithm group samples biases symmetrically about zero using multiples of a fixed bias, $\Gamma_0$, with two orthogonal shear directions in either a 2x2- or 2x3-frame approach. The ``B'' algorithm group samples biases across a single wavelength, using two orthogonal shear directions in either a 2x3- or 2x4-frame approach. The purpose of this study was to apply Fisher information theory to derive the Cram\'er-Rao lower bounds on the variances of the gradient magnitude and azimuth for each of the four acquisition approaches under a Poisson noise model. The gradient CRLBs were derived for both a 40x and 100x objective lens, a weak- and standard-gradient strength specimen, and under equal and non-equal dose conditions. An ``error area'' was defined as $\gamma\sigma_{\hat{\gamma}}\sigma_{\hat{\theta}}$ using the CRLBs, where $\hat{\gamma}$ and $\hat{\theta}$ are the gradient magnitude and azimuth estimators, respectively. The error area was used to define a signal-to-noise ratio, $\text{SNR} = 1/\sigma_{\hat{\gamma}}\sigma_{\hat{\theta}}$. Surface plots of the SNR were plotted over the typical empirical range of gradient values. In general, the A-group of algorithms exhibited higher SNRs than the B-group for all experimental conditions, with the ``B: 2x3'' approach consistently performing the worst. These plots can be used to choose the optimal acquisition approach for a given experimental setup and estimated specimen gradient strength. Future work will explore the propagation of the derived gradient variance into the variance of the OPL image itself under a combined Poisson and Gaussian noise model. 
+\end{abstract}
+
+%\renewcommand{\baselinestretch}{2.0}
+
+
+\section{Introduction}
+
+Phase microscopy describes a family of powerful microscopy methods that derive contrast from the phase shifts that occur when light travels through a material, removing the need for the use of an exogenous contrast agent \cite{physicstoday}. Differential interference contrast (DIC) light microscopy is a popular phase microscopy technique used to observe structure and motion in living cells \cite{shribakbook, shribak, microbook}. A DIC image is produced through the interference of a reference beam with a copy of itself that is slightly sheared in a lateral direction. The image can be used to display the gradient of the optical path length (OPL) through the specimen \cite{shribakbook, shribak}. While the method provides good contrast and resolution along the direction of the shear, there is a loss of information in the direction perpendicular to the shear. Accordingly, multiple azimuthal orientations are traditionally used. \cite{shribakbook, shribak}.
+
+Shribak \cite{shribak} developed an ``orientation-independent'' DIC (OI-DIC) system that allows for rapid, computer-controlled selection of shear direction and bias, removing the need for mechanical rotation of the specimen. Consider a specimen with a two-dimensional OPL $\phi(x,y)$. The OPL gradient vector can be written,
+
+\begin{align}
+  \nonumber \bm{G}(x,y) &= \nabla\phi(x,y)\\
+              &= [\gamma(x,y) \text{cos}\theta(x,y), \gamma(x,y) \text{sin}\theta(x,y)]
+\end{align}
+
+\noindent where $\gamma(x,y)$ is the gradient magnitude and $\theta(x,y)$ is the gradient azimuth. Using this system, the measured intensity distribution from OI-DIC can be described as follows,
+
+\begin{equation}
+  \begin{cases}
+    I_{1j}(x,y) = \tilde{I}(x,y) \text{sin}^2 \Big( \frac{\pi}{\lambda} \Big\{ \Gamma_j + \sqrt{2} d \cdot \gamma(x,y) \text{cos}[\theta(x,y)] \Big\} \Big) + I_c(x,y) & \\[10pt]
+    I_{2j}(x,y) = \tilde{I}(x,y) \text{sin}^2 \Big( \frac{\pi}{\lambda} \Big\{ \Gamma_j + \sqrt{2} d \cdot \gamma(x,y) \text{sin}[\theta(x,y)] \Big\} \Big) + I_c(x,y) & 
+  \end{cases}
+  \label{eq:model}
+\end{equation}
+
+\noindent where $\tilde{I}(x,y)$ and $\lambda$ are the entrance intensity and wavelength of the illuminating beam, $I_c(x,y)$ is the stray light intensity, $\Gamma_j$ is the phase bias between the two sheared beams, and $\sqrt{2}d$ is the shear distance. Intensities $I_{1j}(x,y)$ and $I_{2j}(x,y)$ represent the $x$ and $y$ shear directions, respectively.
+
+Shribak proposed two groups of acquisition approaches to estimate $\bm{G}(x,y)$ from this intensity distribution. The first (Group A) uses two orthogonal shear directions and biases symmetrically distributed around zero, where $\Gamma_0$ is typically 0.15$\lambda$ for a specimen with standard gradient magnitude, or 0.05$\lambda$ if the specimen has a weak gradient magnitude. The second (Group B) uses two orthogonal shear directions and biases distributed over one wavelength region. The bias values $\Gamma_j$ are shown in Table \ref{tab:approaches} for each approach. 
+
+\begin{table}[H]
+  \centering
+  \caption{OI-DIC Acquisition approaches. }
+  \begin{tabular}{l c l}
+    \hline
+    \hline
+    A: 2x2 &    & $\bm{\Gamma} = \{-\Gamma_0, \Gamma_0\}$ \\
+    A: 2x3 &    & $\bm{\Gamma} = \{-\Gamma_0, 0, \Gamma_0\}$\\
+    B: 2x3 &    & $\bm{\Gamma} = \{-\lambda/3, 0, \lambda/3\}$\\
+    B: 2x4 &    & $\bm{\Gamma} = \{0, \lambda/4, \lambda/2, 3\lambda/4\}$\\
+    \hline
+    \hline
+  \end{tabular}
+  \label{tab:approaches}
+\end{table}
+
+After one of these approaches is used to acquire an estimate of the OPL gradient, $\hat{\bm{G}}(x,y)$, the OPL itself is computed with the following filter:
+
+\begin{equation}
+  \hat{\phi}(x,y) = F^{-1}\Bigg\{ \frac{F[\hat{\gamma}(x,y)e^{i\hat{\theta}(x,y)}]}{i(\omega_x + i\omega_y)}\Bigg\}
+  \label{eq:OPL}
+\end{equation}
+
+To reduce noise in the computed OPL image estimate, it is of interest to minimize the variance in the gradient component estimates $\hat{\gamma}(x,y)$ and $\hat{\theta}(x,y)$. Fisher information theory provides a way of determining the minimum possible variance for an unbiased estimator for a given data model and probability distribution \cite{fisher}. This is known as the Cram\'er-Rao Lower Bound (CRLB). The purpose of this study was to investigate the CRLB for $\hat{\gamma}(x,y)$ and $\hat{\theta}(x,y)$ derived from each of the four OI-DIC acquisition approaches listed above assuming a Poisson-distributed data.
+
+\section{Methods}
+
+\subsection{Fisher Theory and Cram\'er-Rao Lower Bound}
+The Cram\'er-Rao inequality states \cite{fisher} that the covariance matrix of any unbiased estimator $\hat{\bm{x}}$ of the vector of parameters $\bm{x} \in X$, where $X$ is the parameter space, is no smaller than the inverse of the Fisher information matrix $F(\bm{x})$, or
+
+\begin{equation}
+  Cov\{\hat{\bm{x}}\} \ge F^{-1}(\bm{x})
+  \label{eq:inequality}
+\end{equation}
+
+The Fisher information matrix is constructed from the likelihood function for $\bm{x}$. Given the data $g$ with probability distribution $p_{\bm{x}}(g)$, the Fisher information matrix is given by
+
+\begin{equation}
+  F(\bm{x}) = E \bigg\{ \bigg( \frac{\partial}{\partial\bm{x}} \text{ln} p_{\bm{x}}(g)\bigg)^T \bigg( \frac{\partial}{\partial\bm{x}} \text{ln} p_{\bm{x}}(g)\bigg) \bigg\} \text{,   }  \bm{x} \in X
+\end{equation}
+
+Modeling the data as a Poisson-distributed process with a mean given by Equation (\ref{eq:model}), the elements of the Fisher information matrix for the parameter vector $\bm{x} = (\gamma, \theta)$ are given by
+
+\begin{align}
+\nonumber  F_{11} &= \sum_{j=1}^{J} \frac{1}{I_{1j}}\bigg[ \frac{\partial I_{1j}}{\partial\gamma}\bigg]^2 + \frac{1}{I_{2j}}\bigg[ \frac{\partial I_{2j}}{\partial\gamma}\bigg]^2\\[6pt]
+  F_{22} &= \sum_{j=1}^{J} \frac{1}{I_{1j}}\bigg[ \frac{\partial I_{1j}}{\partial\theta}\bigg]^2 + \frac{1}{I_{2j}}\bigg[ \frac{\partial I_{2j}}{\partial\theta}\bigg]^2\\[6pt]
+\nonumber  F_{12} &= F_{21} = \sum_{j=1}^{J} \frac{1}{I_{1j}} \frac{\partial I_{1j}}{\partial\gamma} \frac{\partial I_{1j}}{\partial\theta} + \frac{1}{I_{2j}} \frac{\partial I_{2j}}{\partial\gamma} \frac{\partial I_{2j}}{\partial\theta}
+\end{align}
+
+\noindent where $j \in [1,...,J]$. The CRLB for the variances of both $\hat{\gamma}(x,y)$ and $\hat{\theta}(x,y)$ are calculated according to Equation (\ref{eq:inequality}), leaving: 
+
+\begin{align}
+\nonumber  \sigma_{\hat{\gamma}}^2 &\ge \big[ F^{-1}\big]_{11}\\[6pt]
+  \sigma_{\hat{\theta}}^2 &\ge \big[ F^{-1}\big]_{22}
+                            \label{eq:CRLB}
+\end{align}
+
+\noindent where $\sigma_{\hat{\gamma}}^2 = Var\{\hat{\gamma}(x,y)\}$ and $\sigma_{\hat{\theta}}^2 = Var\{\hat{\theta}(x,y)\}$. 
+
+\subsection{CRLB Calculation}
+
+The CRLBs for $\hat{\gamma}(x,y)$ and $\hat{\theta}(x,y)$ were derived according to Equation (\ref{eq:CRLB}) for the four acquisition approaches given in Table \ref{tab:approaches}. For each approach, four different experimental setups were also modeled: a 40x ($d = 255$ nm) and a 100x ($d = 100$ nm) objective lens, and a typical ($\Gamma_0 = 0.15\lambda$) and ``weak'' ($\Gamma_0 = 0.05\lambda$) gradient specimen. A range of intensity values $\tilde{I}$ were modeled, with stray intensity $I_c = 0.01 \tilde{I}$. The wavelength was set to $\lambda = 546$ nm for all derivations. Finally, each CRLB was derived under two dose conditions. For a given approach $i \in [1,2,3,4]$ with $J_i$ bias values, the total ``dose'' can be defined as
+
+\begin{align*}
+  I^i_T &= \sum_{j=0}^{J_i} I^i_{1j} + I^i_{2j} \\
+  I^i_T &\propto \sum_{j=0}^{J_i} \tilde{I}^i_j
+\end{align*}
+
+\noindent where $\tilde{I}^i_j$ is the intensity for frame $j$ of approach $i$. For the ``equal dose'' condition, the intensity values for each frame were scaled ($\tilde{I}^i_j = \tilde{I}_0 / J_i$) such that the total intensity was constant for each approach:
+
+\begin{equation*}
+  I^1_T = I^2_T = I^3_T = I^4_T = \tilde{I}_0
+\end{equation*}
+
+For the ``non-equal dose'' condition, the intensity values were constant ($\tilde{I}^i_j = \tilde{I}_0$) for all frames of each approach, such that the total intensity for each approach was dependent on the number of frames:
+
+\begin{equation*}
+  I^i_T = J_i \tilde{I}_0
+\end{equation*}
+
+% possibly sample expression from sympy...
+
+\section{Results}
+
+The expressions derived in Equation (\ref{eq:CRLB}) are functions of both $\gamma(x,y)$ and $\theta(x,y)$, the true values of the gradient magnitude and azimuth. For this study, these functions were calculated on a parameter space representative of typical empirical values. 
+
+\begin{align*}
+  0.0 \text{ }\frac{\text{nm}}{\text{nm}} \le &\text{ }\gamma(x,y) \le 0.3 \text{ }\frac{\text{nm}}{\text{nm}} \\[6pt]
+  0 \text{ rad} \le & \text{ }\theta(x,y) \le 2\pi \text{ rad}
+\end{align*}
+
+An infinitesimal area in polar ``gradient'' space can be represented as $\gamma d\gamma d\theta$. Accordingly, we can define an ``error area'' as $\gamma \sigma_{\gamma} \sigma_{\theta}$. This value is characteristic of the combined standard deviation of the two gradient parameters as a function their true values. Furthermore, we can define an effective signal-to-noise ratio (SNR) as the magnitude of the gradient vector $\gamma$ divided by this error area; that is, $\text{SNR} = \frac{1}{\sigma_{\gamma}\sigma_{\theta}}$. Figures \ref{fig:40x_N} and \ref{fig:100x_N} display surface plots of this SNR for a standard gradient specimen, for all acquisition approaches using a 40x and 100x objective lens, respectively. Similar plots for a weak gradient specimen are shown in Figures \ref{fig:40x_W} and \ref{fig:100x_W}. The left column of each figure show the ``equal'' dose condition and the right columns show the ``non-equal'' dose condition. 
+
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{../images/forreport/40_normal_SNR}
+  \captionsetup{width=0.85\linewidth}
+  \caption{SNR surfaces for a 40x objective lens under standard gradient conditions, with both equal (left) and non-equal (right) dose conditions. \label{fig:40x_N}}
+\end{figure}
+
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{../images/forreport/40_weak_SNR}
+  \captionsetup{width=0.85\linewidth}
+  \caption{SNR surfaces for a 40x objective lens under weak gradient conditions, with both equal (left) and non-equal (right) dose conditions. \label{fig:40x_W}}
+\end{figure}
+  
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{../images/forreport/100_normal_SNR}
+  \captionsetup{width=0.85\linewidth}
+  \caption{SNR surfaces for a 100x objective lens under standard gradient conditions, with both equal (left) and non-equal (right) dose conditions. \label{fig:100x_N}}
+\end{figure}
+
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{../images/forreport/100_weak_SNR}
+  \captionsetup{width=0.85\linewidth}
+  \caption{SNR surfaces for a 40x objective lens under weak gradient conditions, with both equal (left) and non-equal (right) dose conditions. \label{fig:100x_W}}
+\end{figure}
+
+The above surfaces were calculated with an entrance intensity value of $\tilde{I}_0 = 100$. To explore the effect of different intensities, the CRLBs for $\hat{\gamma}(x,y)$ and $\hat{\theta}(x,y)$ were calculated for a number of entrance intensity values. The median CRLB standard deviation values over the previously used parameter space are shown in Figure \ref{fig:intensity} for a sample experimental condition: a 40x objective lens and a ``standard'' gradient under equal-dose conditions. Curves generated under all other experimental conditions showed the same trend. 
+
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{../images/forreport/intensity_equal}
+  \captionsetup{width=0.85\linewidth}
+  \caption{Median standard deviation for $\gamma$ (left) and $\theta$ (right) as a function of entrance intensity. The data is for a 40x objective lens, a ``normal'' gradient specimen, under equal-dose conditions.  \label{fig:intensity}}
+\end{figure}
+
+\section{Discussion}
+
+In DIC microscopy, estimators for $\gamma(x,y)$ and $\theta(x,y)$ are constructed from direct measurements, given in Equation (\ref{eq:model}). These measurements are Poisson-distributed random variables which have variances equal to the means, by definition. Accordingly, the SNR for a Poisson-distributed process increases with $\sqrt{I}$, where $I$ is the measured intensity. Since a higher entrance intensity leads to a relatively lower variance in the intensity measurements, this corresponds to a relatively lower variance in the estimates $\hat{\gamma}(x,y)$ and $\hat{\theta}(x,y)$ as well. This is displayed in Figure \ref{fig:intensity}. The standard deviations for both parameters decrease with $I^{-1/2}$; Thus, a higher SNR in the gradient estimate can be achieved with a higher entrance intensity. 
+
+Accordingly, the ``non-equal dose'' SNR values are considerably larger than the values for the ``equal dose'' condition, since the ``non-equal'' dose condition leads to a higher total intensity under all approaches. The comparison between dose conditions also allows for the evaluation of each approach independent of total intensity. For example, the ``B: 2x4'' approach shows nearly the highest SNR for high $\gamma$ values in the curves for the 40x objective lens under the ``non-equal'' dose condition. However, it is significantly lower than both A-group approaches under the equal-dose condition, indicating that its advantage comes from a higher total intensity from more frames, rather than its specific bias sampling method. In general, both A group approaches performed better than the B group approaches. The ``B: 2x3'' approach consistently resulted in the lowest SNR for each experimental condition.
+
+These surface plots assist in the selection of the optimal acquisition approach for a given imaging task, depending on the specific experimental conditions and expected range of gradient values. In the future, studies will be performed to propagate the variances of the estimated gradient parameters $\hat{\gamma}(x,y)$ and $\hat{\theta}(x,y)$ into the OPL estimate itself, $\hat{\phi}(x,y)$, using the filter in Equation (\ref{eq:OPL}). Additionally, future studies will seek to systematically investigate the sampling of bias-space as a function of gradient magnitude to optimize the SNR of both the gradient and OPL under a combined Poisson and Gaussian noise model. 
+
+\section{Conclusion}
+
+This study demonstrated the application of Fisher information theory to the optimization of acquisition parameters in orientation-independent differential interference contrast microscopy. The Cram\'er-Rao lower bounds for the variances of the OPL image gradient magnitude and azimuth were derived and calculated over a range of typical values for four acquisition approaches, two objective lenses, two specimen models and two ``dose'' conditions. The ``B:2x3'' approach was shown to exhibit the lowest ``SNR'' for all experimental conditions. In general, both A-group approaches exhibited higher SNRs than the B-group approaches, leading to the conclusion that the specific sampling of bias-space can reduce the variance in the gradient estimate in a manner independent of the reduced variance that results from a higher total intensity. 
+
+
+
+%\renewcommand{\baselinestretch}{1.3}
+\bibliographystyle{ieeetr}
+\bibliography{dicreportbib}
+
+\end{document}
